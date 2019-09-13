@@ -13,3 +13,6 @@
 [submodule "components/esp-adv-button"]
 	path = components/esp-adv-button
 	url = https://github.com/RavenSystem/esp-adv-button.git
+[submodule "esp-homekit-common-functions"]
+	path = esp-homekit-common-functions
+	url = https://github.com/maccoylton/esp-homekit-common-functions.git

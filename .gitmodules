@@ -10,3 +10,6 @@
 [submodule "components/esp-wifi-config"]
 	path = components/esp-wifi-config
 	url = https://github.com/maximkulkin/esp-wifi-config.git
+[submodule "components/esp-adv-button"]
+	path = components/esp-adv-button
+	url = https://github.com/RavenSystem/esp-adv-button.git

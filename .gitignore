@@ -1,0 +1,5 @@
+esp-homekit-sonoff-mini.xcodeproj/
+build/
+firmware/
+src/.DS_Store
+.DS_Store

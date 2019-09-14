@@ -121,12 +121,13 @@ void s2_button_callback(uint8_t gpio, void* args) {
 
 void gpio_init() {
 
-    const uint8_t single_press = 1, double_press = 2,  long_press = 3, very_long_press = 4, hold_press = 5;
+    const uint8_t toggle_press = 0, single_press = 1, double_press = 2,  long_press = 3, very_long_press = 4, hold_press = 5;
 
     adv_button_set_evaluate_delay(10);
 
     /* GPIO for button, pull-up resistor, inverted */
     adv_button_create(s2_gpio, true, false);
+    adv_button_register_callback_fn(s2_gpio, s2_button_callback, toggle_press, NULL);
     adv_button_register_callback_fn(s2_gpio, s2_button_callback, single_press, NULL);
     
     adv_button_create(reset_button_gpio, true, false);

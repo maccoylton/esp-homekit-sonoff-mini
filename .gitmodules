@@ -16,3 +16,6 @@
 [submodule "components/esp-homekit-common-functions"]
 	path = components/esp-homekit-common-functions
 	url = https://github.com/maccoylton/esp-homekit-common-functions.git
+[submodule "components/UDPlogger"]
+	path = components/UDPlogger
+	url = https://github.com/HomeACcessoryKid/UDPlogger.git

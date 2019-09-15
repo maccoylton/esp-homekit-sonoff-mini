@@ -36,6 +36,8 @@
 
 #include <adv_button.h>
 #include <led_codes.h>
+#include <udplogger.h>
+
 
 // add this section to make your device OTA capable
 // create the extra characteristic &ota_trigger, at the end of the primary service (before the NULL)
@@ -126,6 +128,7 @@ void gpio_init() {
     adv_button_set_evaluate_delay(10);
 
     /* GPIO for button, pull-up resistor, inverted */
+    printf("Initialising buttons\n");
     adv_button_create(s2_gpio, true, false);
     adv_button_register_callback_fn(s2_gpio, s2_button_callback, toggle_press, NULL);
     adv_button_register_callback_fn(s2_gpio, s2_button_callback, single_press, NULL);
@@ -142,6 +145,7 @@ void gpio_init() {
 }
 
 void switch_on_callback(homekit_characteristic_t *_ch, homekit_value_t on, void *context) {
+    printf("Switch on callback\n");
     relay_write(switch_on.value.bool_value);
     led_write(switch_on.value.bool_value);
 }
@@ -216,6 +220,7 @@ void create_accessory_name() {
 void user_init(void) {
     uart_set_baud(0, 115200);
     
+    udplog_init(3);
     gpio_init();
     
     create_accessory_name();

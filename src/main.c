@@ -54,6 +54,10 @@ void switch_on_callback(homekit_characteristic_t *_ch, homekit_value_t on, void 
 
 
 homekit_characteristic_t wifi_reset   = HOMEKIT_CHARACTERISTIC_(CUSTOM_WIFI_RESET, false, .setter=wifi_reset_set);
+homekit_characteristic_t wifi_check_interval   = HOMEKIT_CHARACTERISTIC_(CUSTOM_WIFI_CHECK_INTERVAL, 10, .setter=wifi_check_interval_set);
+/* checks the wifi is connected and flashes status led to indicated connected */
+homekit_characteristic_t task_stats   = HOMEKIT_CHARACTERISTIC_(CUSTOM_TASK_STATS, false , .setter=task_stats_set);
+
 homekit_characteristic_t ota_trigger  = API_OTA_TRIGGER;
 homekit_characteristic_t name         = HOMEKIT_CHARACTERISTIC_(NAME, DEVICE_NAME);
 homekit_characteristic_t manufacturer = HOMEKIT_CHARACTERISTIC_(MANUFACTURER,  DEVICE_MANUFACTURER);
@@ -132,12 +136,19 @@ homekit_accessory_t *accessories[] = {
             &switch_on,
             &ota_trigger,
             &wifi_reset,
+            &wifi_check_interval,
+            &task_stats,
             NULL
         }),
         NULL
     }),
     NULL
 };
+
+
+void accessory_init_not_paired (void) {
+    /* initalise anything you don't want started until wifi and homekit imitialisation is confirmed, but not paired */
+}
 
 void accessory_init (void ){
     /* initalise anything you don't want started until wifi and pairing is confirmed */

@@ -146,13 +146,28 @@ homekit_accessory_t *accessories[] = {
 };
 
 
+void recover_from_reset (int reason){
+    /* called if we restarted abnormally */
+    printf ("%s: reason %d\n", __func__, reason);
+    load_characteristic_from_flash(&switch_on);
+    relay_write(switch_on.value.bool_value, relay_gpio);
+}
+
+void save_characteristics ( ){
+    /* called on a timer to save an values yuo want save after update */
+    printf ("%s:\n", __func__);
+    /* save_characteristic_to_flash(&switch_on, switch_on.value); don't reall need to sabve state of a light switch */
+    save_characteristic_to_flash(&wifi_check_interval, wifi_check_interval.value);
+}
+
+
 void accessory_init_not_paired (void) {
     /* initalise anything you don't want started until wifi and homekit imitialisation is confirmed, but not paired */
 }
 
 void accessory_init (void ){
     /* initalise anything you don't want started until wifi and pairing is confirmed */
-    
+    homekit_characteristic_notify(&switch_on, switch_on.value);
 }
 
 homekit_server_config_t config = {

@@ -1,4 +1,5 @@
-![GitHub All Releases](https://img.shields.io/github/downloads/maccoylton/esp-homekit-sonoff-mini/total)
+![GitHub All Releases](https://img.shields.io/github/downloads/maccoylton/esp-homekit-sonoff-mini/total) 
+![GitHub Releases](https://img.shields.io/github/downloads/maccoylton/esp-homekit-sonoff-mini/latest/total)
 
 # esp-homekit-sonoff-mini
 

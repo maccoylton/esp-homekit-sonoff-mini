@@ -1,3 +1,5 @@
+![GitHub All Releases](https://img.shields.io/github/downloads/maccoylton/esp-homekit-sonoff-mini/total)
+
 # esp-homekit-sonoff-mini
 
 Homekit firmware for Sonoff mini

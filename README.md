@@ -10,4 +10,4 @@ You can wire a switch across S1 & S2, this is NOT 240V, it is only ESP8265 signa
 Tested in UK dry linning wall box, tight fit but works ok. 
 
 
-12th April 2022 - New capability added to preserve the power state over a power outage. By default the state will not be preserved, if you want to change the default to preserve the state then using Eve app set "Preserve State" to "On". 
+**12th April 2022 - New capability added to preserve the power state over a power outage. By default the state will not be preserved, if you want to change the default to preserve the state then using Eve app set "Preserve State" to "On".**

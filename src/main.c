@@ -41,6 +41,7 @@
 #include <custom_characteristics.h>
 #include <shared_functions.h>
 
+#define SAVE_DELAY 1000
 
 
 // add this section to make your device OTA capable
@@ -57,6 +58,9 @@ homekit_characteristic_t wifi_reset   = HOMEKIT_CHARACTERISTIC_(CUSTOM_WIFI_RESE
 homekit_characteristic_t wifi_check_interval   = HOMEKIT_CHARACTERISTIC_(CUSTOM_WIFI_CHECK_INTERVAL, 10, .setter=wifi_check_interval_set);
 /* checks the wifi is connected and flashes status led to indicated connected */
 homekit_characteristic_t task_stats   = HOMEKIT_CHARACTERISTIC_(CUSTOM_TASK_STATS, false , .setter=task_stats_set);
+homekit_characteristic_t ota_beta     = HOMEKIT_CHARACTERISTIC_(CUSTOM_OTA_BETA, false, .setter=ota_beta_set);
+homekit_characteristic_t lcm_beta    = HOMEKIT_CHARACTERISTIC_(CUSTOM_LCM_BETA, false, .setter=lcm_beta_set);
+homekit_characteristic_t preserve_state   = HOMEKIT_CHARACTERISTIC_(CUSTOM_PRESERVE_STATE, false, .setter=preserve_state_set);
 
 homekit_characteristic_t ota_trigger  = API_OTA_TRIGGER;
 homekit_characteristic_t name         = HOMEKIT_CHARACTERISTIC_(NAME, DEVICE_NAME);
@@ -89,6 +93,7 @@ void s2_button_callback(uint8_t gpio, void* args, const uint8_t param) {
     relay_write(switch_on.value.bool_value, relay_gpio);
     led_write(switch_on.value.bool_value, LED_GPIO);
     homekit_characteristic_notify(&switch_on, switch_on.value);
+    sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
 }
 
 void gpio_init() {
@@ -117,6 +122,7 @@ void switch_on_callback(homekit_characteristic_t *_ch, homekit_value_t on, void 
     printf("Switch on callback\n");
     relay_write(switch_on.value.bool_value, relay_gpio);
     led_write(switch_on.value.bool_value, LED_GPIO);
+    sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
 }
 
 
@@ -138,6 +144,7 @@ homekit_accessory_t *accessories[] = {
             &wifi_reset,
             &wifi_check_interval,
             &task_stats,
+            &preserve_state,
             NULL
         }),
         NULL
@@ -149,15 +156,19 @@ homekit_accessory_t *accessories[] = {
 void recover_from_reset (int reason){
     /* called if we restarted abnormally */
     printf ("%s: reason %d\n", __func__, reason);
-    load_characteristic_from_flash(&switch_on);
-    relay_write(switch_on.value.bool_value, relay_gpio);
 }
 
 void save_characteristics ( ){
-    /* called on a timer to save an values yuo want save after update */
+    /* called on a timer to save an values you want save after update */
     printf ("%s:\n", __func__);
-    /* save_characteristic_to_flash(&switch_on, switch_on.value); don't reall need to sabve state of a light switch */
-    save_characteristic_to_flash(&wifi_check_interval, wifi_check_interval.value);
+    save_characteristic_to_flash(&preserve_state, preserve_state.value);
+    if ( preserve_state.value.bool_value == true){
+        printf ("%s:Preserving state\n", __func__);
+        save_characteristic_to_flash(&switch_on, switch_on.value);
+        save_characteristic_to_flash(&wifi_check_interval, wifi_check_interval.value);
+    } else {
+        printf ("%s:Not preserving state\n", __func__);
+    }
 }
 
 
@@ -167,6 +178,18 @@ void accessory_init_not_paired (void) {
 
 void accessory_init (void ){
     /* initalise anything you don't want started until wifi and pairing is confirmed */
+    printf ("%s:\n", __func__);
+    if ( preserve_state.value.bool_value == true){
+        printf ("%s:Loading preserved state\n", __func__);
+        load_characteristic_from_flash(&switch_on);
+        relay_write(switch_on.value.bool_value, relay_gpio);
+        led_write(switch_on.value.bool_value, LED_GPIO);
+        load_characteristic_from_flash(&wifi_check_interval);
+    } else {
+        printf ("%s:Preserved state is off\n", __func__);
+    }
+    homekit_characteristic_notify(&preserve_state, preserve_state.value);
+    homekit_characteristic_notify(&wifi_check_interval, wifi_check_interval.value);
     homekit_characteristic_notify(&switch_on, switch_on.value);
 }
 

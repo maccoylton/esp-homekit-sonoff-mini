@@ -40,7 +40,7 @@ EXTRA_CFLAGS += -DconfigUSE_TRACE_FACILITY
 include $(SDK_PATH)/common.mk
 
 signature:
-	$(shell /usr/local/opt/openssl/bin/openssl   sha384 -binary -out firmware/main.bin.sig firmware/main.bin)
+	$(shell /opt/local/bin/openssl sha384 -binary -out firmware/main.bin.sig firmware/main.bin)
 	$(shell printf "%08x" `cat firmware/main.bin | wc -c`| xxd -r -p >>firmware/main.bin.sig)
  
 monitor:

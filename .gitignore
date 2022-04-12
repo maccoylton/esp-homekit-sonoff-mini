@@ -3,4 +3,5 @@ build/
 firmware/
 src/.DS_Store
 src/udplog-client
+src/latest-pre-release
 .DS_Store

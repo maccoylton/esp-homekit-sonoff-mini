@@ -1,7 +1,4 @@
-esp-homekit-sonoff-mini.xcodeproj/
-build/
-firmware/
-src/.DS_Store
-src/udplog-client
-src/latest-pre-release
+.vscode/
 .DS_Store
+src/build/
+src/firmware/

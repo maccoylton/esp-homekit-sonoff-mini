@@ -19,7 +19,7 @@
 #define DEVICE_NAME "Sonoff"
 #define DEVICE_MODEL "Mini"
 #define DEVICE_SERIAL "12345678"
-#define FW_VERSION "1.0"
+#define FW_VERSION "1.9"
 
 #include <stdio.h>
 #include <espressif/esp_wifi.h>
@@ -41,7 +41,7 @@
 #include <custom_characteristics.h>
 #include <shared_functions.h>
 
-#define SAVE_DELAY 1000
+#define SAVE_DELAY 3000
 
 
 // add this section to make your device OTA capable
@@ -61,6 +61,7 @@ homekit_characteristic_t task_stats   = HOMEKIT_CHARACTERISTIC_(CUSTOM_TASK_STAT
 homekit_characteristic_t ota_beta     = HOMEKIT_CHARACTERISTIC_(CUSTOM_OTA_BETA, false, .setter=ota_beta_set);
 homekit_characteristic_t lcm_beta    = HOMEKIT_CHARACTERISTIC_(CUSTOM_LCM_BETA, false, .setter=lcm_beta_set);
 homekit_characteristic_t preserve_state   = HOMEKIT_CHARACTERISTIC_(CUSTOM_PRESERVE_STATE, false, .setter=preserve_state_set);
+homekit_characteristic_t log_level_ch     = HOMEKIT_CHARACTERISTIC_(CUSTOM_LOG_LEVEL, 2, .setter=log_level_set);
 
 homekit_characteristic_t ota_trigger  = API_OTA_TRIGGER;
 homekit_characteristic_t name         = HOMEKIT_CHARACTERISTIC_(NAME, DEVICE_NAME);
@@ -75,14 +76,12 @@ homekit_characteristic_t switch_on = HOMEKIT_CHARACTERISTIC_(
 
 // The GPIO pin that is connected to the relay on the Sonoff Mini.
 const int relay_gpio = 12;
-// The GPIO pin that is connected to the LED on the Sonoff Mini.
-const int LED_GPIO = 13;
-// The GPIO pin that is oconnected to the button on the Sonoff Mini.
+// The GPIO pin that is connected to the button on the Sonoff Mini.
 const int reset_button_gpio = 0;
 const int s2_gpio = 4;
 int led_off_value=1; /* global varibale to support LEDs set to 0 where the LED is connected to GND, 1 where +3.3v */
 
-const int status_led_gpio = 13; /*set the gloabl variable for the led to be sued for showing status */
+const int status_led_gpio = 13; /* global variable for the LED status indicator */
 
 
 void s2_button_callback(uint8_t gpio, void* args, const uint8_t param) {
@@ -91,7 +90,7 @@ void s2_button_callback(uint8_t gpio, void* args, const uint8_t param) {
     printf("Toggling relay\n");
     switch_on.value.bool_value = !switch_on.value.bool_value;
     relay_write(switch_on.value.bool_value, relay_gpio);
-    led_write(switch_on.value.bool_value, LED_GPIO);
+    led_write(switch_on.value.bool_value, status_led_gpio);
     homekit_characteristic_notify(&switch_on, switch_on.value);
     sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
 }
@@ -111,8 +110,8 @@ void gpio_init() {
     adv_button_register_callback_fn(reset_button_gpio, reset_button_callback, VERYLONGPRESS_TYPE, NULL, 0);
     
     
-    gpio_enable(LED_GPIO, GPIO_OUTPUT);
-    led_write(false, LED_GPIO);
+    gpio_enable(status_led_gpio, GPIO_OUTPUT);
+    led_write(false, status_led_gpio);
     gpio_enable(relay_gpio, GPIO_OUTPUT);
     relay_write(switch_on.value.bool_value, relay_gpio);
     
@@ -121,7 +120,7 @@ void gpio_init() {
 void switch_on_callback(homekit_characteristic_t *_ch, homekit_value_t on, void *context) {
     printf("Switch on callback\n");
     relay_write(switch_on.value.bool_value, relay_gpio);
-    led_write(switch_on.value.bool_value, LED_GPIO);
+    led_write(switch_on.value.bool_value, status_led_gpio);
     sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
 }
 
@@ -145,6 +144,7 @@ homekit_accessory_t *accessories[] = {
             &wifi_check_interval,
             &task_stats,
             &preserve_state,
+            &log_level_ch,
             NULL
         }),
         NULL
@@ -183,7 +183,7 @@ void accessory_init (void ){
         printf ("%s:Loading preserved state\n", __func__);
         load_characteristic_from_flash(&switch_on);
         relay_write(switch_on.value.bool_value, relay_gpio);
-        led_write(switch_on.value.bool_value, LED_GPIO);
+        led_write(switch_on.value.bool_value, status_led_gpio);
         load_characteristic_from_flash(&wifi_check_interval);
     } else {
         printf ("%s:Preserved state is off\n", __func__);

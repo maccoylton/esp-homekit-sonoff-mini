@@ -19,7 +19,7 @@
 #define DEVICE_NAME "Sonoff"
 #define DEVICE_MODEL "Mini"
 #define DEVICE_SERIAL "12345678"
-#define FW_VERSION "1.10"
+#define FW_VERSION "1.11"
 
 #include <stdio.h>
 #include <espressif/esp_wifi.h>

@@ -19,7 +19,7 @@
 #define DEVICE_NAME "Sonoff"
 #define DEVICE_MODEL "Mini"
 #define DEVICE_SERIAL "12345678"
-#define FW_VERSION "1.9"
+#define FW_VERSION "1.10"
 
 #include <stdio.h>
 #include <espressif/esp_wifi.h>
@@ -60,6 +60,7 @@ homekit_characteristic_t wifi_check_interval   = HOMEKIT_CHARACTERISTIC_(CUSTOM_
 homekit_characteristic_t task_stats   = HOMEKIT_CHARACTERISTIC_(CUSTOM_TASK_STATS, false , .setter=task_stats_set);
 homekit_characteristic_t ota_beta     = HOMEKIT_CHARACTERISTIC_(CUSTOM_OTA_BETA, false, .setter=ota_beta_set);
 homekit_characteristic_t lcm_beta    = HOMEKIT_CHARACTERISTIC_(CUSTOM_LCM_BETA, false, .setter=lcm_beta_set);
+homekit_characteristic_t lcm_emergency = HOMEKIT_CHARACTERISTIC_(CUSTOM_LCM_EMERGENCY, false, .setter=lcm_emergency_set);
 homekit_characteristic_t preserve_state   = HOMEKIT_CHARACTERISTIC_(CUSTOM_PRESERVE_STATE, false, .setter=preserve_state_set);
 homekit_characteristic_t log_level_ch     = HOMEKIT_CHARACTERISTIC_(CUSTOM_LOG_LEVEL, 2, .setter=log_level_set);
 
@@ -145,6 +146,9 @@ homekit_accessory_t *accessories[] = {
             &task_stats,
             &preserve_state,
             &log_level_ch,
+            &ota_beta,
+            &lcm_beta,
+            &lcm_emergency,
             NULL
         }),
         NULL

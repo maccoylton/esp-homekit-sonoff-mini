@@ -19,7 +19,7 @@
 #define DEVICE_NAME "Sonoff"
 #define DEVICE_MODEL "Mini"
 #define DEVICE_SERIAL "12345678"
-#define FW_VERSION "1.12"
+#define FW_VERSION "1.19"
 
 #include <stdio.h>
 #include <espressif/esp_wifi.h>
@@ -63,6 +63,7 @@ homekit_characteristic_t lcm_beta    = HOMEKIT_CHARACTERISTIC_(CUSTOM_LCM_BETA, 
 homekit_characteristic_t lcm_emergency = HOMEKIT_CHARACTERISTIC_(CUSTOM_LCM_EMERGENCY, false, .setter=lcm_emergency_set);
 homekit_characteristic_t preserve_state   = HOMEKIT_CHARACTERISTIC_(CUSTOM_PRESERVE_STATE, false, .setter=preserve_state_set);
 homekit_characteristic_t log_level_ch     = HOMEKIT_CHARACTERISTIC_(CUSTOM_LOG_LEVEL, 2, .setter=log_level_set);
+homekit_characteristic_t factory_reset_password = HOMEKIT_CHARACTERISTIC_(CUSTOM_SET_FACTORY_PASSWORD, .value={}, .setter=factory_reset_set_password_callback);
 
 homekit_characteristic_t ota_trigger  = API_OTA_TRIGGER;
 homekit_characteristic_t name         = HOMEKIT_CHARACTERISTIC_(NAME, DEVICE_NAME);
@@ -149,6 +150,7 @@ homekit_accessory_t *accessories[] = {
             &ota_beta,
             &lcm_beta,
             &lcm_emergency,
+            &factory_reset_password,
             NULL
         }),
         NULL
@@ -211,7 +213,8 @@ void user_init(void) {
 
     gpio_init();
 
-    
+    factory_reset_cmd_start();
+
     wifi_config_init("SonoffMini", NULL, on_wifi_ready);
 
 }
